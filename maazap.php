@@ -3,7 +3,7 @@
  * Plugin Name: MAAZAP
  * Plugin URI: https://www.instagram.com/jefferson.ornellas
  * Description: Publique uma notícia no seu site e ela vai sozinha para todos os seus grupos de WhatsApp. Você escolhe o formato (texto com prévia do link, foto com legenda ou enquete), monta a mensagem com um modelo pronto e acompanha tudo em um painel com número de grupos, membros e envios. Também dá para enviar manualmente quando quiser e convidar novos membros automaticamente.
- * Version: 3.12.3
+ * Version: 3.12.4
  * Author: Jefferson Ornellas
  * Author URI: https://www.instagram.com/jefferson.ornellas
  * Text Domain: maazap
@@ -74,14 +74,20 @@ class UzAPI_Broadcaster {
 		return isset( $d['Version'] ) ? $d['Version'] : '0';
 	}
 
-	/** Consulta o último Release do GitHub (com cache de 6h para não bater na API a cada page load). */
-	private function gh_release() {
+	/**
+	 * Consulta o último Release do GitHub.
+	 * Guarda o resultado por 6h para não bater na API a cada carregamento de página;
+	 * $forcar ignora esse cache (usado quando o usuário pede para verificar de novo).
+	 */
+	private function gh_release( $forcar = false ) {
 		if ( ! $this->gh_configurado() ) {
 			return null;
 		}
-		$cache = get_transient( 'maazap_gh_release' );
-		if ( false !== $cache ) {
-			return $cache ? $cache : null;
+		if ( ! $forcar ) {
+			$cache = get_transient( 'maazap_gh_release' );
+			if ( false !== $cache ) {
+				return $cache ? $cache : null;
+			}
 		}
 		$r = wp_remote_get(
 			'https://api.github.com/repos/' . MAAZAP_GH_USUARIO . '/' . MAAZAP_GH_REPO . '/releases/latest',
@@ -119,7 +125,9 @@ class UzAPI_Broadcaster {
 		if ( empty( $transient->checked ) ) {
 			return $transient;
 		}
-		$rel = $this->gh_release();
+		// "Verificar novamente" no painel de plugins deve ignorar o cache
+		$forcar = ! empty( $_GET['force-check'] );
+		$rel    = $this->gh_release( $forcar );
 		if ( ! $rel ) {
 			return $transient;
 		}
@@ -183,6 +191,8 @@ class UzAPI_Broadcaster {
 	}
 
 	public static function ativar() {
+		// zera o cache do GitHub: assim desativar/reativar realmente busca de novo
+		delete_transient( 'maazap_gh_release' );
 		if ( ! wp_next_scheduled( self::CRON_SNAP ) ) {
 			wp_schedule_event( time() + 120, 'daily', self::CRON_SNAP );
 		}
