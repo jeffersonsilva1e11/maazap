@@ -1,0 +1,14 @@
+# pacotes gerados para os releases
+*.zip
+build/
+
+# lixo de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editores
+.vscode/
+.idea/
+*.swp
+*~
