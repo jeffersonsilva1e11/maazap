@@ -4,7 +4,7 @@ Tags: whatsapp, grupos, notícias, automação, disparo
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 3.12.0
+Stable tag: 3.12.1
 License: GPLv2 or later
 
 Publique uma notícia no seu site e ela vai sozinha para todos os seus grupos de WhatsApp.
@@ -61,6 +61,9 @@ Sim, mas cada site precisa da sua própria instância na UzAPI, com um número d
 Todas as versões ficam disponíveis na página de releases do projeto no GitHub. Baixe o .zip da versão desejada e instale pelo painel do WordPress.
 
 == Changelog ==
+
+= 3.12.1 =
+* Atalho "Configurações" direto na lista de plugins
 
 = 3.12.0 =
 * Textos de toda a interface reescritos em linguagem simples

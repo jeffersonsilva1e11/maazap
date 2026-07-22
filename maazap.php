@@ -3,7 +3,7 @@
  * Plugin Name: MAAZAP
  * Plugin URI: https://www.instagram.com/jefferson.ornellas
  * Description: Publique uma notícia no seu site e ela vai sozinha para todos os seus grupos de WhatsApp. Você escolhe o formato (texto com prévia do link, foto com legenda ou enquete), monta a mensagem com um modelo pronto e acompanha tudo em um painel com número de grupos, membros e envios. Também dá para enviar manualmente quando quiser e convidar novos membros automaticamente.
- * Version: 3.12.0
+ * Version: 3.12.1
  * Author: Jefferson Ornellas
  * Author URI: https://www.instagram.com/jefferson.ornellas
  * Text Domain: maazap
@@ -41,6 +41,7 @@ class UzAPI_Broadcaster {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'registrar_config' ) );
 		add_action( 'in_admin_header', array( $this, 'limpar_notices' ), 1000 );
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'link_configuracoes' ) );
 		add_action( 'transition_post_status', array( $this, 'ao_mudar_status' ), 10, 3 );
 		add_action( self::CRON_POST, array( $this, 'disparar_post' ), 10, 1 );
 		add_action( self::CRON_SNAP, array( $this, 'cron_snapshot' ) );
@@ -202,6 +203,13 @@ class UzAPI_Broadcaster {
 			$this->sincronizar_grupos();
 		}
 		$this->snapshot();
+	}
+
+	/** Atalho "Configurações" na lista de plugins. */
+	public function link_configuracoes( $links ) {
+		$atalho = '<a href="' . esc_url( admin_url( 'options-general.php?page=uzapi-gn' ) ) . '">Configurações</a>';
+		array_unshift( $links, $atalho );
+		return $links;
 	}
 
 	/** Remove avisos de terceiros SÓ na nossa página (deixa o resto do admin intacto). */
