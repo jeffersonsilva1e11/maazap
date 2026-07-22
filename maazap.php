@@ -3,7 +3,7 @@
  * Plugin Name: MAAZAP
  * Plugin URI: https://www.instagram.com/jefferson.ornellas
  * Description: Publique uma notícia no seu site e ela vai sozinha para todos os seus grupos de WhatsApp. Você escolhe o formato (texto com prévia do link, foto com legenda ou enquete), monta a mensagem com um modelo pronto e acompanha tudo em um painel com número de grupos, membros e envios. Também dá para enviar manualmente quando quiser e convidar novos membros automaticamente.
- * Version: 3.12.1
+ * Version: 3.12.2
  * Author: Jefferson Ornellas
  * Author URI: https://www.instagram.com/jefferson.ornellas
  * Text Domain: maazap
@@ -343,13 +343,17 @@ class UzAPI_Broadcaster {
 				'image'        => $img,
 			);
 		} else {
+			$corpo = array( 'body' => $texto );
+			// A prévia obriga a UzAPI a baixar a página do link. Se o site bloquear
+			// leitores automáticos, o envio falha — por isso isto é opcional.
+			if ( $this->cfg( 'preview', 0 ) ) {
+				$corpo = array( 'preview_url' => true, 'body' => $texto );
+			}
 			$payload = array(
 				'to'           => $to,
 				'type'         => 'text',
 				'delayMessage' => (int) $delay,
-				// preview_url: ativa a prévia do link (parâmetro não documentado na spec,
-				// informado pelo suporte da uzAPI). Vai DENTRO do objeto text.
-				'text'         => array( 'preview_url' => true, 'body' => $texto ),
+				'text'         => $corpo,
 			);
 		}
 
@@ -994,6 +998,7 @@ class UzAPI_Broadcaster {
 			'phone_number_id' => sanitize_text_field( $in['phone_number_id'] ?? '' ),
 			'token'           => sanitize_text_field( $in['token'] ?? '' ),
 			'formato'         => in_array( $formato, array( 'texto', 'imagem' ), true ) ? $formato : 'texto',
+			'preview'         => ! empty( $in['preview'] ) ? 1 : 0,
 			'delay'           => max( 0, (int) ( $in['delay'] ?? 5 ) ),
 			'jitter'          => max( 0, (int) ( $in['jitter'] ?? 3 ) ),
 			'delay_min'       => max( 0, (int) ( $in['delay_min'] ?? 3 ) ),
@@ -1245,7 +1250,7 @@ class UzAPI_Broadcaster {
 	private function aba_config() {
 		$c = wp_parse_args( $this->cfg(), array(
 			'ativo' => 0, 'username' => '', 'version' => 'v1', 'phone_number_id' => '', 'token' => '',
-			'formato' => 'texto', 'delay' => 5, 'jitter' => 3, 'delay_min' => 3, 'mencionar_todos' => 0,
+			'formato' => 'texto', 'preview' => 0, 'delay' => 5, 'jitter' => 3, 'delay_min' => 3, 'mencionar_todos' => 0,
 			'crescimento' => 0, 'crescimento_texto' => '📩 Convide amigos para o grupo:',
 			'template' => "📰 *{titulo}*\n\n{link}", 'post_types' => array( 'post' ),
 		) );
@@ -1310,6 +1315,10 @@ class UzAPI_Broadcaster {
 							<option value="imagem" <?php selected( $c['formato'], 'imagem' ); ?>>Foto da notícia com legenda</option>
 						</select>
 						<p class="description"><strong>Texto com prévia:</strong> envia a mensagem e o WhatsApp monta um cartãozinho com a imagem do link. <strong>Foto com legenda:</strong> envia a imagem destacada da notícia como foto, com o texto embaixo — aparece maior e nunca falha. Se a prévia não estiver aparecendo nos seus grupos, use a segunda opção.</p>
+					</td></tr>
+					<tr><th>Pedir a prévia do link</th><td>
+						<label><input type="checkbox" name="<?php echo $O; ?>[preview]" value="1" <?php checked( $c['preview'], 1 ); ?>> Solicitar que o WhatsApp monte o cartãozinho do link</label>
+						<p class="description">⚠️ Ligue apenas se as mensagens estiverem chegando normalmente. Para montar a prévia, o WhatsApp precisa <strong>ler a página da notícia</strong>; se o seu site bloquear leitores automáticos (comum em plugins de segurança e Cloudflare), a mensagem pode não ser entregue. Se os envios pararem depois de ligar isto, desligue.</p>
 					</td></tr>
 					<tr><th>Modelo da mensagem</th><td>
 						<textarea name="<?php echo $O; ?>[template]" rows="5" class="large-text"><?php echo esc_textarea( $c['template'] ); ?></textarea>
