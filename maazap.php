@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Troque pelo seu usuário e repositório. Depois, cada nova versão publicada
  * como "Release" no GitHub aparece como atualização normal no painel do WordPress.
  */
-define( 'MAAZAP_GH_USUARIO', 'SEU-USUARIO-GITHUB' );
+define( 'MAAZAP_GH_USUARIO', 'jeffersonsilva1e11' );
 define( 'MAAZAP_GH_REPO', 'maazap' );
 
 class UzAPI_Broadcaster {
