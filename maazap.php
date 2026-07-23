@@ -3,7 +3,7 @@
  * Plugin Name: MAAZAP
  * Plugin URI: https://www.instagram.com/jefferson.ornellas
  * Description: Publique uma notícia no seu site e ela vai sozinha para todos os seus grupos de WhatsApp. Você escolhe o formato (texto com prévia do link, foto com legenda ou enquete), monta a mensagem com um modelo pronto e acompanha tudo em um painel com número de grupos, membros e envios. Também dá para enviar manualmente quando quiser e convidar novos membros automaticamente.
- * Version: 3.12.4
+ * Version: 3.12.5
  * Author: Jefferson Ornellas
  * Author URI: https://www.instagram.com/jefferson.ornellas
  * Text Domain: maazap
@@ -252,7 +252,7 @@ class UzAPI_Broadcaster {
 		return sprintf(
 			'https://api.uzapi.com.br/%s/%s/%s',
 			rawurlencode( $this->cfg( 'username' ) ),
-			rawurlencode( $this->cfg( 'version', 'v1' ) ),
+			rawurlencode( $this->cfg( 'version', 'v.0.0.83' ) ),
 			rawurlencode( $this->cfg( 'phone_number_id' ) )
 		);
 	}
@@ -999,7 +999,7 @@ class UzAPI_Broadcaster {
 		return array(
 			'ativo'           => ! empty( $in['ativo'] ) ? 1 : 0,
 			'username'        => sanitize_text_field( $in['username'] ?? '' ),
-			'version'         => sanitize_text_field( $in['version'] ?? 'v1' ),
+			'version'         => sanitize_text_field( $in['version'] ?? 'v.0.0.83' ),
 			'phone_number_id' => sanitize_text_field( $in['phone_number_id'] ?? '' ),
 			'token'           => sanitize_text_field( $in['token'] ?? '' ),
 			'formato'         => in_array( $formato, array( 'texto', 'imagem' ), true ) ? $formato : 'texto',
@@ -1253,7 +1253,7 @@ class UzAPI_Broadcaster {
 	/* -------- CONFIG -------- */
 	private function aba_config() {
 		$c = wp_parse_args( $this->cfg(), array(
-			'ativo' => 0, 'username' => '', 'version' => 'v1', 'phone_number_id' => '', 'token' => '',
+			'ativo' => 0, 'username' => '', 'version' => 'v.0.0.83', 'phone_number_id' => '', 'token' => '',
 			'formato' => 'texto', 'delay' => 5, 'jitter' => 3, 'delay_min' => 3, 'mencionar_todos' => 0,
 			'crescimento' => 0, 'crescimento_texto' => '📩 Convide amigos para o grupo:',
 			'template' => "📰 *{titulo}*\n\n{link}", 'post_types' => array( 'post' ),
@@ -1292,8 +1292,8 @@ class UzAPI_Broadcaster {
 						<p class="description">O nome de usuário da sua conta na UzAPI.</p>
 					</td></tr>
 					<tr><th>Versão da API</th><td>
-						<input type="text" class="small-text" name="<?php echo $O; ?>[version]" value="<?php echo esc_attr( $c['version'] ); ?>">
-						<p class="description">Deixe como <code>v1</code>, a não ser que a UzAPI oriente outro valor.</p>
+						<input type="text" class="regular-text" name="<?php echo $O; ?>[version]" value="<?php echo esc_attr( $c['version'] ); ?>">
+						<p class="description">Informado no painel da UzAPI. O valor padrão já vem preenchido.</p>
 					</td></tr>
 					<tr><th>ID da instância</th><td>
 						<input type="text" class="regular-text" name="<?php echo $O; ?>[phone_number_id]" value="<?php echo esc_attr( $c['phone_number_id'] ); ?>">
